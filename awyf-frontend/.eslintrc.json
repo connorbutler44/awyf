@@ -2,6 +2,10 @@
   "extends": "next/core-web-vitals",
   "rules": {
     "semi": "warn",
-    "quotes": "warn"
+    "quotes": "warn",
+    "indent": [
+      "warn",
+      2
+    ]
   }
 }
