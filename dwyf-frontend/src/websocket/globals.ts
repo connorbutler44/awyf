@@ -1,0 +1,1 @@
+export const websocketMap: {[key: string]: WebSocket } = {};

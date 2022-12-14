@@ -1,6 +1,5 @@
 import Header from "../../../src/components/Header";
 import Room from "./room";
-import Home from "../../home";
 
 interface Props {
   params: {
@@ -14,9 +13,7 @@ export default async function RoomPage(props: Props) {
     <div className="h-screen flex flex-col">
       <Header />
       <div className="flex-1 h-max bg-zinc-800 p-4 text-white justify-center flex">
-        <Home>
-          <Room roomId={props.params.slug}/>
-        </Home>
+        <Room roomId={props.params.slug}/>
       </div>
     </div>
   );

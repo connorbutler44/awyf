@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { conn, EventData, useWebsocket } from "../../../src/websocket";
+import { EventData, useWebsocket } from "../../../src/websocket";
 
 interface Props {
     roomId: string;
@@ -11,7 +11,10 @@ interface Props {
 export default function Room(props: Props) {
   const [message, setMessage] = React.useState("");
 
-  useWebsocket(console.log);
+  const { readyState, sendMessage } = useWebsocket({
+    onMessage: console.log,
+    url: `ws://localhost:8080/ws/${props.roomId}`,
+  });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.currentTarget.value);
@@ -24,13 +27,33 @@ export default function Room(props: Props) {
       ID: props.roomId,
       Sender: "Me"
     };
-    conn.send(JSON.stringify(message));
+
+    sendMessage(JSON.stringify(message));
   };
 
   return (
     <div className="text-black">
-      <input value={message} onChange={onChange} />
-      <button onClick={onClick}>Test</button>
+      <Loading readyState={readyState}>
+        <input value={message} onChange={onChange} />
+        <button onClick={onClick}>Test</button>
+      </Loading>
     </div>
   );
 }
+
+export const Loading = ({ readyState, children }: {
+  readyState: number,
+  children: React.ReactNode,
+}) => {
+  switch (readyState) {
+  case WebSocket.OPEN:
+    return <div>{children}</div>;
+  case WebSocket.CLOSED:
+  case WebSocket.CLOSING:
+    return <>Error establishing socket connection</>;
+  case WebSocket.CONNECTING:
+    return <>Connecting to server...</>;
+  default:
+    return <></>;
+  }
+};
