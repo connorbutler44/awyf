@@ -1,14 +1,20 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type user struct {
 	ID   string `json:"id"`
 	Name string `json:"title"`
+}
+
+type lobby struct {
+	ID uuid.UUID `json:"id"`
 }
 
 var users = []user{
@@ -17,11 +23,57 @@ var users = []user{
 }
 
 func main() {
+	hub := NewHub()
+	go hub.Run()
+
+	flag.Parse()
+
 	router := gin.Default()
+	router.Use(CORSMiddleware())
 	router.GET("/users", getUsers)
 	router.GET("/users/:id", getUserByID)
+	router.POST("lobby", createLobby)
+
+	router.GET("/ws/:roomId", func(c *gin.Context) {
+		roomId := c.Param("roomId")
+		serveWs(c, roomId, hub)
+	})
 
 	router.Run("localhost:8080")
+
+	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	// 	serveWs(hub, w, r)
+	// })
+
+	// err := http.ListenAndServe(*addr, nil)
+	// if err != nil {
+	// 	log.Fatal("ListenAndServe: ", err)
+	// }
+}
+
+// TODO: make sure this is how to setup CORS properly for gin
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func createLobby(c *gin.Context) {
+	var newLobby lobby = lobby{
+		ID: uuid.New(),
+	}
+
+	c.IndentedJSON(http.StatusCreated, newLobby)
 }
 
 func getUsers(c *gin.Context) {

@@ -1,7 +1,7 @@
 export default function Head() {
   return (
     <>
-      <title>Art With Your Friends</title>
+      <title>Draw With Your Friends</title>
     </>
   );
 }

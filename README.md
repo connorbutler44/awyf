@@ -1,1 +1,1 @@
-# Art With Your Friends 😊
+# Draw With Your Friends 😊

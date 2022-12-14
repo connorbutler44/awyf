@@ -1,14 +1,13 @@
-async function getPosts() {
-  return Promise.resolve([1, 2, 3, 4]);
-}
+import Header from "../src/components/Header";
+import Form from "./form";
   
 export default async function Page() {
-  // Fetch data directly in a Server Component
-  const recentPosts = await getPosts();
-  // Forward fetched data to your Client Component
   return (
-    <h1 className="text-3xl font-bold underline">
-      Art With Your Friends 🎭
-    </h1>
+    <div className="h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 h-max bg-zinc-800 p-4 text-white justify-center flex">
+        <Form />
+      </div>
+    </div>
   );
 }
